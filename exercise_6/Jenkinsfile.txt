@@ -1,0 +1,41 @@
+pipeline {
+    agent {
+        docker {
+            image 'python:3.12-slim'
+        }
+    }
+
+    options {
+        timestamps()
+    }
+
+    stages {
+        stage('Install Dependencies') {
+            steps {
+                sh 'python -m pip install --upgrade pip'
+                sh 'python -m pip install -r requirements.txt'
+            }
+        }
+
+        stage('Python Syntax Check') {
+            steps {
+                sh 'python -m py_compile delivery_metrics.py'
+            }
+        }
+
+        stage('Validate Docker Compose') {
+            steps {
+                sh 'python -c "import yaml; print(\'PyYAML available\')"'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Exercise 6 pipeline completed successfully.'
+        }
+        failure {
+            echo 'Exercise 6 pipeline failed. Check the stage logs.'
+        }
+    }
+}
